@@ -43,11 +43,6 @@ interface ModelsStore {
   downloadModel: (modelId: string) => Promise<boolean>;
   cancelDownload: (modelId: string) => Promise<boolean>;
   deleteModel: (modelId: string) => Promise<boolean>;
-  getModelInfo: (modelId: string) => ModelInfo | undefined;
-  isModelDownloading: (modelId: string) => boolean;
-  isModelVerifying: (modelId: string) => boolean;
-  isModelExtracting: (modelId: string) => boolean;
-  getDownloadProgress: (modelId: string) => DownloadProgress | undefined;
 
   // Internal setters
   setModels: (models: ModelInfo[]) => void;
@@ -248,26 +243,6 @@ export const useModelStore = create<ModelsStore>()(
         set({ error: `Failed to delete model: ${err}` });
         return false;
       }
-    },
-
-    getModelInfo: (modelId: string) => {
-      return get().models.find((model) => model.id === modelId);
-    },
-
-    isModelDownloading: (modelId: string) => {
-      return modelId in get().downloadingModels;
-    },
-
-    isModelVerifying: (modelId: string) => {
-      return modelId in get().verifyingModels;
-    },
-
-    isModelExtracting: (modelId: string) => {
-      return modelId in get().extractingModels;
-    },
-
-    getDownloadProgress: (modelId: string) => {
-      return get().downloadProgress[modelId];
     },
 
     initialize: async () => {

@@ -1,7 +1,16 @@
 MIT License
 
 Copyright (c) 2025 CJ Pais
-Copyright (c) 2026 aitomate (VoxType)
+Copyright (c) 2026 aitomate (Szeptucha)
+
+Szeptucha is a derivative work. It was forked, in accordance with the terms of
+the MIT License, from the Handy speech-to-text application created by CJ Pais
+(https://github.com/cjpais/Handy). Starting from that codebase, we now develop
+our own changes and features in the application's source code.
+
+We sincerely thank CJ Pais for creating Handy and for releasing it under the
+MIT License — this project would not exist without that work. The original
+copyright notice above is retained as required by the license.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,8 +1,8 @@
 # Home-manager module for Szeptucha speech-to-text
 #
 # Provides a systemd user service for autostart.
-# Usage: imports = [ handy.homeManagerModules.default ];
-#        services.handy.enable = true;
+# Usage: imports = [ szeptucha.homeManagerModules.default ];
+#        services.szeptucha.enable = true;
 {
   config,
   lib,
@@ -10,28 +10,28 @@
   ...
 }:
 let
-  cfg = config.services.handy;
+  cfg = config.services.szeptucha;
 in
 {
-  options.services.handy = {
+  options.services.szeptucha = {
     enable = lib.mkEnableOption "Szeptucha speech-to-text user service";
 
     package = lib.mkOption {
       type = lib.types.package;
-      defaultText = lib.literalExpression "handy.packages.\${system}.handy";
+      defaultText = lib.literalExpression "szeptucha.packages.\${system}.szeptucha";
       description = "The Szeptucha package to use.";
     };
   };
 
   config = lib.mkIf cfg.enable {
-    systemd.user.services.handy = {
+    systemd.user.services.szeptucha = {
       Unit = {
         Description = "Szeptucha speech-to-text";
         After = [ "graphical-session.target" ];
         PartOf = [ "graphical-session.target" ];
       };
       Service = {
-        ExecStart = "${cfg.package}/bin/handy";
+        ExecStart = "${cfg.package}/bin/szeptucha";
         Restart = "on-failure";
         RestartSec = 5;
       };

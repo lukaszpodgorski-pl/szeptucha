@@ -7,12 +7,12 @@
 #
 # Usage in your flake:
 #
-#   inputs.handy.url = "github:OWNER/szeptucha";
+#   inputs.szeptucha.url = "github:OWNER/szeptucha";
 #
 #   nixosConfigurations.myhost = nixpkgs.lib.nixosSystem {
 #     modules = [
-#       handy.nixosModules.default
-#       { programs.handy.enable = true; }
+#       szeptucha.nixosModules.default
+#       { programs.szeptucha.enable = true; }
 #     ];
 #   };
 {
@@ -22,15 +22,15 @@
   ...
 }:
 let
-  cfg = config.programs.handy;
+  cfg = config.programs.szeptucha;
 in
 {
-  options.programs.handy = {
+  options.programs.szeptucha = {
     enable = lib.mkEnableOption "Szeptucha offline speech-to-text";
 
     package = lib.mkOption {
       type = lib.types.package;
-      defaultText = lib.literalExpression "handy.packages.\${system}.handy";
+      defaultText = lib.literalExpression "szeptucha.packages.\${system}.szeptucha";
       description = "The Szeptucha package to use.";
     };
   };

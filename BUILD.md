@@ -86,7 +86,7 @@ The raw binary (`src-tauri/target/release/handy`) cannot run standalone — it n
 cd /tmp
 ar x /path/to/Szeptucha/src-tauri/target/release/bundle/deb/Szeptucha_*_amd64.deb data.tar.gz
 tar xzf data.tar.gz
-sudo cp usr/bin/handy /usr/bin/
+sudo cp usr/bin/szeptucha /usr/bin/
 sudo cp -r usr/lib/Szeptucha /usr/lib/
 sudo cp -r usr/share/icons/hicolor/* /usr/share/icons/hicolor/
 sudo cp usr/share/applications/Szeptucha.desktop /usr/share/applications/
@@ -95,7 +95,7 @@ sudo cp usr/share/applications/Szeptucha.desktop /usr/share/applications/
 After subsequent rebuilds, only the binary needs re-copying:
 
 ```bash
-sudo cp src-tauri/target/release/handy /usr/bin/
+sudo cp src-tauri/target/release/szeptucha /usr/bin/
 ```
 
 Resources only need re-copying if they change upstream (new icons, sounds, etc.).

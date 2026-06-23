@@ -268,7 +268,7 @@ mod tests {
     fn build_entry(transcription: &str, post_processed: Option<&str>) -> HistoryEntry {
         HistoryEntry {
             id: 1,
-            file_name: "handy-1.wav".to_string(),
+            file_name: "szeptucha-1.wav".to_string(),
             timestamp: 0,
             saved: false,
             title: "Recording".to_string(),

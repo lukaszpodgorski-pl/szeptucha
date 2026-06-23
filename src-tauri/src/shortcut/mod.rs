@@ -314,16 +314,6 @@ pub fn change_keyboard_implementation_setting(
     })
 }
 
-/// Get the current keyboard implementation
-#[tauri::command]
-#[specta::specta]
-pub fn get_keyboard_implementation(app: AppHandle) -> String {
-    let settings = settings::get_settings(&app);
-    match settings.keyboard_implementation {
-        KeyboardImplementation::Tauri => "tauri".to_string(),
-        KeyboardImplementation::HandyKeys => "handy_keys".to_string(),
-    }
-}
 
 // ============================================================================
 // Validation Helpers

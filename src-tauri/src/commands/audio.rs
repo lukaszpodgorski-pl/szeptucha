@@ -171,13 +171,6 @@ pub fn update_microphone_mode(app: AppHandle, always_on: bool) -> Result<(), Str
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_microphone_mode(app: AppHandle) -> Result<bool, String> {
-    let settings = get_settings(&app);
-    Ok(settings.always_on_microphone)
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn get_available_microphones() -> Result<Vec<AudioDevice>, String> {
     let devices =
         list_input_devices().map_err(|e| format!("Failed to list audio devices: {}", e))?;
@@ -218,15 +211,6 @@ pub fn set_selected_microphone(app: AppHandle, device_name: String) -> Result<()
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_selected_microphone(app: AppHandle) -> Result<String, String> {
-    let settings = get_settings(&app);
-    Ok(settings
-        .selected_microphone
-        .unwrap_or_else(|| "default".to_string()))
-}
-
-#[tauri::command]
-#[specta::specta]
 pub fn get_available_output_devices() -> Result<Vec<AudioDevice>, String> {
     let devices =
         list_output_devices().map_err(|e| format!("Failed to list output devices: {}", e))?;
@@ -261,15 +245,6 @@ pub fn set_selected_output_device(app: AppHandle, device_name: String) -> Result
 
 #[tauri::command]
 #[specta::specta]
-pub fn get_selected_output_device(app: AppHandle) -> Result<String, String> {
-    let settings = get_settings(&app);
-    Ok(settings
-        .selected_output_device
-        .unwrap_or_else(|| "default".to_string()))
-}
-
-#[tauri::command]
-#[specta::specta]
 pub async fn play_test_sound(app: AppHandle, sound_type: String) {
     let sound = match sound_type.as_str() {
         "start" => audio_feedback::SoundType::Start,
@@ -293,15 +268,6 @@ pub fn set_clamshell_microphone(app: AppHandle, device_name: String) -> Result<(
     };
     write_settings(&app, settings);
     Ok(())
-}
-
-#[tauri::command]
-#[specta::specta]
-pub fn get_clamshell_microphone(app: AppHandle) -> Result<String, String> {
-    let settings = get_settings(&app);
-    Ok(settings
-        .clamshell_microphone
-        .unwrap_or_else(|| "default".to_string()))
 }
 
 #[tauri::command]

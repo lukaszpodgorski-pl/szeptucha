@@ -86,8 +86,8 @@
           };
         in
         {
-          handy = pkgs.rustPlatform.buildRustPackage {
-            pname = "handy";
+          szeptucha = pkgs.rustPlatform.buildRustPackage {
+            pname = "szeptucha";
             inherit version;
             src = self;
 
@@ -176,12 +176,12 @@
               description = "A free, open source, and extensible speech-to-text application that works completely offline";
               homepage = "https://www.aitomate.pl";
               license = lib.licenses.mit;
-              mainProgram = "handy";
+              mainProgram = "szeptucha";
               platforms = supportedSystems;
             };
           };
 
-          default = self.packages.${system}.handy;
+          default = self.packages.${system}.szeptucha;
         }
       );
 
@@ -190,7 +190,7 @@
         { lib, pkgs, ... }:
         {
           imports = [ ./nix/module.nix ];
-          programs.handy.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.handy;
+          programs.szeptucha.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.szeptucha;
         };
 
       # Home-manager module for per-user service
@@ -198,7 +198,7 @@
         { lib, pkgs, ... }:
         {
           imports = [ ./nix/hm-module.nix ];
-          services.handy.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.handy;
+          services.szeptucha.package = lib.mkDefault self.packages.${pkgs.stdenv.hostPlatform.system}.szeptucha;
         };
 
       # Development shell for building from source
