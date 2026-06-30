@@ -1,10 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { ModelInfo } from "@/bindings";
 import type { ModelCardStatus } from "./ModelCard";
 import ModelCard from "./ModelCard";
 import WordmarkLogo from "../icons/WordmarkLogo";
+import { Button } from "../ui/Button";
 import { useModelStore } from "../../stores/modelStore";
 
 interface OnboardingProps {
@@ -15,6 +16,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onModelSelected }) => {
   const { t } = useTranslation();
   const {
     models,
+    currentModel,
     downloadModel,
     selectModel,
     downloadingModels,
@@ -24,69 +26,56 @@ const Onboarding: React.FC<OnboardingProps> = ({ onModelSelected }) => {
     downloadStats,
   } = useModelStore();
 
-  // Guards so the auto-download and the completion handoff each run once.
-  const startedRef = useRef(false);
-  const completedRef = useRef(false);
+  // Disable "Continue" while we hand off to the app so it can't fire twice.
+  const [continuing, setContinuing] = useState(false);
 
-  // Automatically download every bundled model that isn't present yet.
-  // The user doesn't pick a model — all of them are fetched up front.
-  useEffect(() => {
-    if (startedRef.current) return;
-    if (models.length === 0) return;
-
-    startedRef.current = true;
-    models
-      .filter((m) => !m.is_downloaded)
-      .forEach((m) => {
-        // Progress is tracked centrally in the model store.
-        void downloadModel(m.id);
-      });
-  }, [models, downloadModel]);
-
-  // Once everything is downloaded (and nothing is in flight), select the
-  // recommended model and continue into the app.
-  useEffect(() => {
-    if (completedRef.current) return;
-    if (!startedRef.current) return;
-    if (models.length === 0) return;
-
-    // `is_downloaded` is the backend's definitive "fully installed" signal
-    // (file present, and for directory models: verified + extracted). Relying on
-    // it alone avoids getting stuck if an in-flight map is left populated by a
-    // missed/raced event (e.g. a dev hot-reload mid-download).
-    const allDownloaded = models.every((m) => m.is_downloaded);
-
-    if (allDownloaded) {
-      completedRef.current = true;
-      const target = models.find((m) => m.is_recommended) ?? models[0];
-      selectModel(target.id).then((success) => {
-        if (success) {
-          onModelSelected();
-        } else {
-          toast.error(t("onboarding.errors.selectModel"));
-          completedRef.current = false;
-        }
-      });
-    }
-  }, [
-    models,
-    downloadingModels,
-    verifyingModels,
-    extractingModels,
-    selectModel,
-    onModelSelected,
-    t,
-  ]);
-
-  // Allow retrying a model whose download failed by clicking its card.
-  const handleRetry = (modelId: string) => {
+  // The user picks which models to download instead of fetching all up front.
+  // Clicking a not-yet-downloaded card starts (or retries) its download.
+  const handleDownload = (modelId: string) => {
     void downloadModel(modelId);
+  };
+
+  // Clicking an already-downloaded card makes it the active model.
+  const handleSelect = (modelId: string) => {
+    void selectModel(modelId);
+  };
+
+  // At least one fully-installed model is required before entering the app.
+  const hasDownloadedModel = models.some((m) => m.is_downloaded);
+
+  // Finish onboarding: ensure a downloaded model is selected, then hand off.
+  // Falls back to the recommended (or first) downloaded model if the user
+  // never explicitly clicked one.
+  const handleContinue = async () => {
+    if (continuing) return;
+
+    const selected = models.find(
+      (m) => m.id === currentModel && m.is_downloaded,
+    );
+    const target =
+      selected ??
+      models.find((m) => m.is_downloaded && m.is_recommended) ??
+      models.find((m) => m.is_downloaded);
+
+    if (!target) return;
+
+    setContinuing(true);
+    const success = await selectModel(target.id);
+    if (success) {
+      onModelSelected();
+    } else {
+      toast.error(t("onboarding.errors.selectModel"));
+      setContinuing(false);
+    }
   };
 
   const getModelStatus = (modelId: string): ModelCardStatus => {
     if (modelId in extractingModels) return "extracting";
     if (modelId in verifyingModels) return "verifying";
     if (modelId in downloadingModels) return "downloading";
+    if (modelId === currentModel) return "active";
+    const model = models.find((m) => m.id === modelId);
+    if (model?.is_downloaded) return "available";
     return "downloadable";
   };
 
@@ -105,7 +94,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onModelSelected }) => {
         </p>
       </div>
 
-      <div className="max-w-[600px] w-full mx-auto text-center flex-1 flex flex-col min-h-0">
+      <div className="max-w-[600px] w-full mx-auto text-center flex-1 flex flex-col min-h-0 overflow-y-auto">
         <div className="flex flex-col gap-4 pb-6">
           {models.map((model: ModelInfo) => (
             <ModelCard
@@ -113,13 +102,26 @@ const Onboarding: React.FC<OnboardingProps> = ({ onModelSelected }) => {
               model={model}
               variant={model.is_recommended ? "featured" : "default"}
               status={getModelStatus(model.id)}
-              onSelect={handleRetry}
-              onDownload={handleRetry}
+              onSelect={handleSelect}
+              onDownload={handleDownload}
               downloadProgress={getModelDownloadProgress(model.id)}
               downloadSpeed={getModelDownloadSpeed(model.id)}
             />
           ))}
         </div>
+      </div>
+
+      <div className="max-w-[600px] w-full mx-auto flex flex-col items-center gap-2 shrink-0">
+        <Button
+          variant="primary"
+          size="lg"
+          className="w-full"
+          disabled={!hasDownloadedModel || continuing}
+          onClick={handleContinue}
+        >
+          {t("onboarding.continue")}
+        </Button>
+        <p className="text-text/60 text-sm">{t("onboarding.selectHint")}</p>
       </div>
     </div>
   );

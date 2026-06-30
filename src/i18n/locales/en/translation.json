@@ -17,7 +17,9 @@
     "about": "About"
   },
   "onboarding": {
-    "subtitle": "Szeptucha is getting your models ready — just a moment.",
+    "subtitle": "Choose the models you want and download them to get started.",
+    "continue": "Continue",
+    "selectHint": "Download at least one model. Click a downloaded model to use it.",
     "recommended": "Recommended",
     "download": "Download",
     "downloading": "Downloading...",
@@ -95,7 +97,8 @@
     },
     "errors": {
       "loadModels": "Failed to load available models",
-      "downloadModel": "Failed to download model: {{error}}"
+      "downloadModel": "Failed to download model: {{error}}",
+      "selectModel": "Failed to select model. Please try again."
     },
     "permissions": {
       "title": "Permissions Required",

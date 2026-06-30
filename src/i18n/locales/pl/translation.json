@@ -17,7 +17,9 @@
     "about": "O programie"
   },
   "onboarding": {
-    "subtitle": "Szeptucha szykuje Twoje modele — chwileczkę.",
+    "subtitle": "Wybierz modele, których chcesz używać, i pobierz je, aby zacząć.",
+    "continue": "Kontynuuj",
+    "selectHint": "Pobierz co najmniej jeden model. Kliknij pobrany model, aby go używać.",
     "recommended": "Polecane",
     "download": "Pobierz",
     "downloading": "Pobieranie...",
@@ -95,7 +97,8 @@
     },
     "errors": {
       "loadModels": "Nie udało się wczytać dostępnych modeli",
-      "downloadModel": "Nie udało się pobrać modelu: {{error}}"
+      "downloadModel": "Nie udało się pobrać modelu: {{error}}",
+      "selectModel": "Nie udało się wybrać modelu. Spróbuj ponownie."
     },
     "permissions": {
       "title": "Wymagane uprawnienia",

@@ -622,7 +622,8 @@ impl ModelManager {
 
         // Keep only the curated set of models for this distribution.
         // To expose more of the built-in models, add their IDs here.
-        const CURATED_MODEL_IDS: &[&str] = &["parakeet-tdt-0.6b-v3", "large"];
+        const CURATED_MODEL_IDS: &[&str] =
+            &["parakeet-tdt-0.6b-v3", "large", "turbo", "medium", "small"];
         available_models.retain(|id, _| CURATED_MODEL_IDS.contains(&id.as_str()));
 
         // Auto-discover custom Whisper models (.bin files) in the models directory
