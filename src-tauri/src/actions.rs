@@ -8,6 +8,7 @@ use crate::managers::transcription::TranscriptionManager;
 use crate::settings::{get_settings, AppSettings, APPLE_INTELLIGENCE_PROVIDER_ID};
 use crate::shortcut;
 use crate::tray::{change_tray_icon, TrayIconState};
+use crate::overlay;
 use crate::utils::{
     self, show_processing_overlay, show_recording_overlay, show_transcribing_overlay,
 };
@@ -16,10 +17,22 @@ use ferrous_opencc::{config::BuiltinConfig, OpenCC};
 use log::{debug, error, warn};
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::{Arc, Mutex};
 use std::time::Instant;
 use tauri::Manager;
 use tauri::{AppHandle, Emitter};
+
+const PREVIEW_INTERVAL: std::time::Duration = std::time::Duration::from_millis(1500);
+
+/// Stop flag for the active live-preview loop. Cleared to suppress stale emits.
+static PREVIEW_FLAG: Lazy<Mutex<Option<Arc<AtomicBool>>>> = Lazy::new(|| Mutex::new(None));
+
+pub(crate) fn stop_preview_loop() {
+    if let Some(flag) = PREVIEW_FLAG.lock().unwrap().take() {
+        flag.store(false, Ordering::SeqCst);
+    }
+}
 
 #[derive(Clone, serde::Serialize)]
 struct RecordingErrorEvent {
@@ -460,6 +473,36 @@ impl ShortcutAction for TranscribeAction {
         if recording_error.is_none() {
             // Dynamically register the cancel shortcut in a separate task to avoid deadlock
             shortcut::register_cancel_shortcut(app);
+
+            let live_settings = get_settings(app);
+            if live_settings.live_preview {
+                overlay::set_overlay_size(app, true);
+                let flag = Arc::new(AtomicBool::new(true));
+                *PREVIEW_FLAG.lock().unwrap() = Some(flag.clone());
+
+                let app_preview = app.clone();
+                let rm_preview = Arc::clone(&rm);
+                let tm_preview = Arc::clone(&app.state::<Arc<TranscriptionManager>>());
+                std::thread::spawn(move || {
+                    while flag.load(Ordering::SeqCst) {
+                        std::thread::sleep(PREVIEW_INTERVAL);
+                        if !flag.load(Ordering::SeqCst) {
+                            break;
+                        }
+                        let samples = match rm_preview.snapshot_recording() {
+                            None => break,                        // stopped or cancelled
+                            Some(s) if s.is_empty() => continue,  // no speech captured yet
+                            Some(s) => s,
+                        };
+                        // Blocks on the engine mutex (serialized with the final transcribe).
+                        if let Ok(text) = tm_preview.transcribe(samples) {
+                            if flag.load(Ordering::SeqCst) && !text.trim().is_empty() {
+                                overlay::emit_partial_transcription(&app_preview, &text);
+                            }
+                        }
+                    }
+                });
+            }
         } else {
             // Starting failed (for example due to blocked microphone permissions).
             // Revert UI state so we don't stay stuck in the recording overlay.
@@ -490,6 +533,8 @@ impl ShortcutAction for TranscribeAction {
     }
 
     fn stop(&self, app: &AppHandle, binding_id: &str, _shortcut_str: &str) {
+        stop_preview_loop();
+
         // Unregister the cancel shortcut when transcription stops
         shortcut::unregister_cancel_shortcut(app);
 
@@ -603,28 +648,38 @@ impl ShortcutAction for TranscribeAction {
                                 utils::hide_recording_overlay(&ah);
                                 change_tray_icon(&ah, TrayIconState::Idle);
                             } else {
-                                let ah_clone = ah.clone();
-                                let paste_time = Instant::now();
                                 let final_text = processed.final_text;
-                                ah.run_on_main_thread(move || {
-                                    match utils::paste(final_text, ah_clone.clone()) {
-                                        Ok(()) => debug!(
-                                            "Text pasted successfully in {:?}",
-                                            paste_time.elapsed()
-                                        ),
-                                        Err(e) => {
-                                            error!("Failed to paste transcription: {}", e);
-                                            let _ = ah_clone.emit("paste-error", ());
-                                        }
-                                    }
-                                    utils::hide_recording_overlay(&ah_clone);
-                                    change_tray_icon(&ah_clone, TrayIconState::Idle);
-                                })
-                                .unwrap_or_else(|e| {
-                                    error!("Failed to run paste on main thread: {:?}", e);
+                                let editor_settings = get_settings(&ah);
+                                if editor_settings.edit_before_paste {
+                                    // Hand off to the editor window; it pastes on confirm
+                                    // via the paste_text command. Clear the recording
+                                    // indicator now — transcription itself is done.
                                     utils::hide_recording_overlay(&ah);
                                     change_tray_icon(&ah, TrayIconState::Idle);
-                                });
+                                    crate::editor::open_transcription_editor(&ah, &final_text);
+                                } else {
+                                    let ah_clone = ah.clone();
+                                    let paste_time = Instant::now();
+                                    ah.run_on_main_thread(move || {
+                                        match utils::paste(final_text, ah_clone.clone()) {
+                                            Ok(()) => debug!(
+                                                "Text pasted successfully in {:?}",
+                                                paste_time.elapsed()
+                                            ),
+                                            Err(e) => {
+                                                error!("Failed to paste transcription: {}", e);
+                                                let _ = ah_clone.emit("paste-error", ());
+                                            }
+                                        }
+                                        utils::hide_recording_overlay(&ah_clone);
+                                        change_tray_icon(&ah_clone, TrayIconState::Idle);
+                                    })
+                                    .unwrap_or_else(|e| {
+                                        error!("Failed to run paste on main thread: {:?}", e);
+                                        utils::hide_recording_overlay(&ah);
+                                        change_tray_icon(&ah, TrayIconState::Idle);
+                                    });
+                                }
                             }
                         }
                         Err(err) => {

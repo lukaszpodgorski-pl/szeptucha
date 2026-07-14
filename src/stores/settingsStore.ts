@@ -143,6 +143,9 @@ const settingUpdaters: {
     commands.changeLazyStreamCloseSetting(value as boolean),
   show_tray_icon: (value) =>
     commands.changeShowTrayIconSetting(value as boolean),
+  live_preview: (value) => commands.changeLivePreviewSetting(value as boolean),
+  edit_before_paste: (value) =>
+    commands.changeEditBeforePasteSetting(value as boolean),
   whisper_accelerator: (value) =>
     commands.changeWhisperAcceleratorSetting(
       value as WhisperAcceleratorSetting,

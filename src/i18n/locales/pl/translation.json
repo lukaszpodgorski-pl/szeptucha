@@ -544,6 +544,14 @@
         "origin": "Szeptucha powstała na bazie forka Handy (handy.computer) i jest w całości utrzymywana przez Łukasza Podgórskiego.",
         "privacy": "Transkrypcja oraz opcjonalne przetwarzanie tekstu odbywają się w 100% lokalnie, na Twoim urządzeniu — Szeptucha nie wysyła Twoich nagrań ani transkrypcji na zewnątrz, nie zbiera telemetrii i nie ma auto-aktualizacji."
       }
+    },
+    "livePreview": {
+      "label": "Podgląd na żywo",
+      "description": "Pokazuj transkrypcję w trakcie mówienia (większe użycie CPU; opóźnienie ~1,5 s)."
+    },
+    "editBeforePaste": {
+      "label": "Edycja przed wklejeniem",
+      "description": "Przejrzyj i popraw transkrypcję w oknie, zanim zostanie wstawiona."
     }
   },
   "footer": {
@@ -615,5 +623,9 @@
   "overlay": {
     "transcribing": "Transkrypcja...",
     "processing": "Przetwarzanie..."
+  },
+  "editor": {
+    "insert": "Wstaw",
+    "cancel": "Anuluj"
   }
 }

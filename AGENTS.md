@@ -125,6 +125,8 @@ Settings are stored using Tauri's store plugin with reactive updates:
 - Audio devices (microphone/output selection)
 - Model preferences (Small/Medium/Turbo/Large Whisper variants)
 - Audio feedback and translation options
+- Live preview (`livePreview`): re-transcribes the growing audio buffer on a fixed interval (not true streaming — `transcribe-rs` exposes no partial API); English-only streaming models are not used for this feature.
+- Edit before paste (`editBeforePaste`): opens an editor window after transcription so the user can review and correct text before it is inserted.
 
 ### Single Instance Architecture
 

@@ -482,6 +482,21 @@ impl AudioRecordingManager {
             _ => None,
         }
     }
+    /// Returns a clone of the current recording buffer without stopping.
+    /// Used by the live-preview loop. `None` if not recording.
+    pub fn snapshot_recording(&self) -> Option<Vec<f32>> {
+        if !matches!(
+            *self.state.lock().unwrap(),
+            RecordingState::Recording { .. }
+        ) {
+            return None;
+        }
+        match self.recorder.lock().unwrap().as_ref() {
+            Some(rec) => rec.snapshot().ok(),
+            None => None,
+        }
+    }
+
     pub fn is_recording(&self) -> bool {
         matches!(
             *self.state.lock().unwrap(),

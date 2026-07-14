@@ -10,6 +10,7 @@ mod helpers;
 mod input;
 mod llm_client;
 mod managers;
+mod editor;
 mod overlay;
 pub mod portable;
 mod settings;
@@ -347,6 +348,8 @@ pub fn run(cli_args: CliArgs) {
             shortcut::change_app_language_setting,
             shortcut::change_keyboard_implementation_setting,
             shortcut::change_show_tray_icon_setting,
+            shortcut::change_live_preview_setting,
+            shortcut::change_edit_before_paste_setting,
             shortcut::change_whisper_accelerator_setting,
             shortcut::change_ort_accelerator_setting,
             shortcut::change_whisper_gpu_device,
@@ -355,6 +358,8 @@ pub fn run(cli_args: CliArgs) {
             shortcut::handy_keys::stop_handy_keys_recording,
             show_main_window_command,
             commands::cancel_operation,
+            commands::paste_text,
+            commands::cancel_transcription_editor,
             commands::get_app_dir_path,
             commands::get_app_settings,
             commands::get_default_settings,

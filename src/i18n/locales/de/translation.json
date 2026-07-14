@@ -536,6 +536,14 @@
           "details": "Szeptucha verwendet Whisper.cpp für schnelle, lokale Sprach-zu-Text-Verarbeitung. Dank an Georgi Gerganov und die Mitwirkenden für ihre großartige Arbeit."
         }
       }
+    },
+    "livePreview": {
+      "label": "Live preview",
+      "description": "Show the transcription as you speak (uses more CPU; ~1.5s delay)."
+    },
+    "editBeforePaste": {
+      "label": "Edit before pasting",
+      "description": "Review and fix the transcription in a window before it is inserted."
     }
   },
   "footer": {
@@ -607,5 +615,9 @@
   "overlay": {
     "transcribing": "Transkribiere...",
     "processing": "Verarbeite..."
+  },
+  "editor": {
+    "insert": "Insert",
+    "cancel": "Cancel"
   }
 }

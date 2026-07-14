@@ -9,6 +9,13 @@ Gotowe instalatory Szeptuchy do dystrybucji.
 | macOS (Apple Silicon) | `macos/Szeptucha_1.0.0_aarch64.dmg` | Tylko aarch64. Podpisany ad-hoc, bez notaryzacji. |
 | Windows (x64) | `windows/szeptucha_1.0.0_x64-setup.exe` | Instalator NSIS. |
 
+### Nowości w tym buildzie (macOS)
+
+- **Podgląd na żywo** — pokazuje transkrypcję w trakcie mówienia (opcja, domyślnie wyłączona; Ustawienia → Zaawansowane → „Podgląd na żywo").
+- **Edycja przed wklejeniem** — okno do przejrzenia i poprawienia tekstu przed wstawieniem (opcja, domyślnie wyłączona).
+
+> Instalator Windows (`windows/…`) pochodzi z wcześniejszego builda i **nie zawiera** tych funkcji — do odświeżenia z maszyny Windows.
+
 ### macOS — uwagi
 
 - Build jest tylko dla **Apple Silicon** (aarch64). Build uniwersalny (Intel) jest zablokowany, bo ONNX Runtime (`ort-sys`, potrzebny do VAD i modeli Parakeet) nie dostarcza prekompilowanych binarek dla `x86_64-apple-darwin`.

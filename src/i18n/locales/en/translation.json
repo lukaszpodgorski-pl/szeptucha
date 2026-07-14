@@ -544,6 +544,14 @@
         "origin": "Szeptucha is built on a fork of Handy (handy.computer) and is maintained by Łukasz Podgórski.",
         "privacy": "Transcription and the optional text post-processing run entirely on your device — Szeptucha never sends your recordings or transcripts anywhere, collects no telemetry, and has no auto-update."
       }
+    },
+    "livePreview": {
+      "label": "Live preview",
+      "description": "Show the transcription as you speak (uses more CPU; ~1.5s delay)."
+    },
+    "editBeforePaste": {
+      "label": "Edit before pasting",
+      "description": "Review and fix the transcription in a window before it is inserted."
     }
   },
   "footer": {
@@ -615,5 +623,9 @@
   "overlay": {
     "transcribing": "Transcribing...",
     "processing": "Processing..."
+  },
+  "editor": {
+    "insert": "Insert",
+    "cancel": "Cancel"
   }
 }

@@ -536,6 +536,14 @@
           "details": "Szeptucha използва Whisper.cpp за бързо локално реч-към-текст. Благодарности на Georgi Gerganov и сътрудниците за отличната работа."
         }
       }
+    },
+    "livePreview": {
+      "label": "Live preview",
+      "description": "Show the transcription as you speak (uses more CPU; ~1.5s delay)."
+    },
+    "editBeforePaste": {
+      "label": "Edit before pasting",
+      "description": "Review and fix the transcription in a window before it is inserted."
     }
   },
   "footer": {
@@ -607,5 +615,9 @@
   "overlay": {
     "transcribing": "Транскрибиране...",
     "processing": "Обработка..."
+  },
+  "editor": {
+    "insert": "Insert",
+    "cancel": "Cancel"
   }
 }

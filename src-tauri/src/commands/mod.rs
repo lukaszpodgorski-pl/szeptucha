@@ -5,13 +5,41 @@ pub mod transcription;
 
 use crate::settings::{get_settings, write_settings, AppSettings, LogLevel};
 use crate::utils::cancel_current_operation;
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 use tauri_plugin_opener::OpenerExt;
 
 #[tauri::command]
 #[specta::specta]
 pub fn cancel_operation(app: AppHandle) {
     cancel_current_operation(&app);
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn paste_text(app: AppHandle, text: String) {
+    crate::editor::hide_transcription_editor(&app);
+    let ah = app.clone();
+    std::thread::spawn(move || {
+        // Let focus return to the previously-active application.
+        std::thread::sleep(std::time::Duration::from_millis(120));
+        let ah2 = ah.clone();
+        let _ = ah.run_on_main_thread(move || {
+            if let Err(e) = crate::utils::paste(text, ah2.clone()) {
+                log::error!("paste_text failed: {e}");
+                let _ = ah2.emit("paste-error", ());
+            }
+            crate::utils::hide_recording_overlay(&ah2);
+            crate::tray::change_tray_icon(&ah2, crate::tray::TrayIconState::Idle);
+        });
+    });
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn cancel_transcription_editor(app: AppHandle) {
+    crate::editor::hide_transcription_editor(&app);
+    crate::utils::hide_recording_overlay(&app);
+    crate::tray::change_tray_icon(&app, crate::tray::TrayIconState::Idle);
 }
 
 #[tauri::command]

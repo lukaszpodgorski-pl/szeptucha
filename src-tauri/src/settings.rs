@@ -428,6 +428,10 @@ pub struct AppSettings {
     pub whisper_gpu_device: i32,
     #[serde(default)]
     pub extra_recording_buffer_ms: u64,
+    #[serde(default = "default_live_preview")]
+    pub live_preview: bool,
+    #[serde(default = "default_edit_before_paste")]
+    pub edit_before_paste: bool,
 }
 
 fn default_model() -> String {
@@ -570,6 +574,13 @@ fn default_whisper_gpu_device() -> i32 {
 
 fn default_typing_tool() -> TypingTool {
     TypingTool::Auto
+}
+
+fn default_live_preview() -> bool {
+    false
+}
+fn default_edit_before_paste() -> bool {
+    false
 }
 
 fn ensure_post_process_defaults(settings: &mut AppSettings) -> bool {
@@ -731,6 +742,8 @@ pub fn get_default_settings() -> AppSettings {
         ort_accelerator: OrtAcceleratorSetting::default(),
         whisper_gpu_device: default_whisper_gpu_device(),
         extra_recording_buffer_ms: 0,
+        live_preview: default_live_preview(),
+        edit_before_paste: default_edit_before_paste(),
     }
 }
 
@@ -902,5 +915,18 @@ mod tests {
         let out = format!("{:?}", map);
         assert!(!out.contains("secret"));
         assert!(out.contains("[REDACTED]"));
+    }
+
+    #[test]
+    fn new_toggles_default_off() {
+        // Serialize the canonical defaults, drop only the two new keys, and
+        // confirm they deserialize back to false via their serde defaults.
+        let mut value = serde_json::to_value(get_default_settings()).unwrap();
+        let obj = value.as_object_mut().unwrap();
+        obj.remove("live_preview");
+        obj.remove("edit_before_paste");
+        let settings: AppSettings = serde_json::from_value(value).unwrap();
+        assert!(!settings.live_preview);
+        assert!(!settings.edit_before_paste);
     }
 }
