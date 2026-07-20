@@ -150,7 +150,8 @@
       "languageOnly": "Tylko {{language}}"
     },
     "cancel": "Anuluj",
-    "cancelDownload": "Anuluj pobieranie"
+    "cancelDownload": "Anuluj pobieranie",
+    "downloadingGeneric": "Pobieranie..."
   },
   "settings": {
     "modelSettings": {

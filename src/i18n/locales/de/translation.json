@@ -150,7 +150,8 @@
       "languageOnly": "Nur {{language}}"
     },
     "cancel": "Abbrechen",
-    "cancelDownload": "Download abbrechen"
+    "cancelDownload": "Download abbrechen",
+    "downloadingGeneric": "Wird heruntergeladen..."
   },
   "settings": {
     "modelSettings": {

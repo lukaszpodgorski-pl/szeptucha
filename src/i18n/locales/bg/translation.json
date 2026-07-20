@@ -150,7 +150,8 @@
       "languageOnly": "Само {{language}}",
       "translation": "Може да превежда на английски",
       "translate": "Превод на английски"
-    }
+    },
+    "downloadingGeneric": "Изтегляне..."
   },
   "settings": {
     "modelSettings": {

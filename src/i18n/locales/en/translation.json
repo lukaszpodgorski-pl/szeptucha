@@ -150,7 +150,8 @@
       "languageOnly": "{{language}} Only",
       "translation": "Can translate to English",
       "translate": "Translate to English"
-    }
+    },
+    "downloadingGeneric": "Downloading..."
   },
   "settings": {
     "modelSettings": {

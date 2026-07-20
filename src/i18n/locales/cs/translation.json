@@ -150,7 +150,8 @@
       "languageOnly": "Pouze {{language}}"
     },
     "cancel": "Zrušit",
-    "cancelDownload": "Zrušit stahování"
+    "cancelDownload": "Zrušit stahování",
+    "downloadingGeneric": "Stahování..."
   },
   "settings": {
     "modelSettings": {
