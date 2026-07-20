@@ -494,7 +494,8 @@ impl ShortcutAction for TranscribeAction {
                             Some(s) if s.is_empty() => continue,  // no speech captured yet
                             Some(s) => s,
                         };
-                        // Blocks on the engine mutex (serialized with the final transcribe).
+                        // Serialized with the final transcribe via the manager's
+                        // transcribe_lock, so a release mid-preview queues instead of failing.
                         if let Ok(text) = tm_preview.transcribe(samples) {
                             if flag.load(Ordering::SeqCst) && !text.trim().is_empty() {
                                 overlay::emit_partial_transcription(&app_preview, &text);

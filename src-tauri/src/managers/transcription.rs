@@ -73,6 +73,11 @@ pub struct TranscriptionManager {
     watcher_handle: Arc<Mutex<Option<thread::JoinHandle<()>>>>,
     is_loading: Arc<Mutex<bool>>,
     loading_condvar: Arc<Condvar>,
+    /// Serializes whole `transcribe()` calls. The engine is taken out of its
+    /// mutex during inference (for panic safety), so without this lock a
+    /// concurrent call — e.g. the final transcription racing an in-flight
+    /// live-preview pass — would see `engine == None` and fail instead of waiting.
+    transcribe_lock: Arc<Mutex<()>>,
 }
 
 impl TranscriptionManager {
@@ -87,6 +92,7 @@ impl TranscriptionManager {
             watcher_handle: Arc::new(Mutex::new(None)),
             is_loading: Arc::new(Mutex::new(false)),
             loading_condvar: Arc::new(Condvar::new()),
+            transcribe_lock: Arc::new(Mutex::new(())),
         };
 
         // Start the idle watcher
@@ -447,6 +453,13 @@ impl TranscriptionManager {
 
         // Update last activity timestamp
         self.touch_activity();
+
+        // Held for the entire call so concurrent transcriptions queue up instead
+        // of failing while the engine is temporarily taken out of its mutex.
+        let _serial_guard = self
+            .transcribe_lock
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
 
         let st = std::time::Instant::now();
 
