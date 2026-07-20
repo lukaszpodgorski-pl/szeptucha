@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # Frontend (bun.lock)
+  - package-ecosystem: "bun"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 10
+    groups:
+      js-minor-patch:
+        update-types: ["minor", "patch"]
+
+  # Rust (src-tauri/Cargo.lock)
+  - package-ecosystem: "cargo"
+    directory: "/src-tauri"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Warsaw"
+    open-pull-requests-limit: 10
+    groups:
+      rust-minor-patch:
+        update-types: ["minor", "patch"]
+
+  # GitHub Actions used in workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
