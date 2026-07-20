@@ -1,0 +1,78 @@
+name: "Release"
+
+# Push a tag (e.g. `git tag v1.2.0 && git push origin v1.2.0`) to build
+# installers for Windows and macOS and attach them to a draft GitHub Release.
+# Review the draft on GitHub and publish it manually.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: "macos-latest" # Apple Silicon
+            args: "--target aarch64-apple-darwin"
+          - platform: "windows-latest" # x64
+            args: ""
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Enable long paths (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+            -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+          git config --system core.longpaths true
+
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ contains(matrix.platform, 'macos') && 'aarch64-apple-darwin' || '' }}
+
+      # Release builds are always clean (no Rust cache) so a stale cached
+      # native lib can never end up inside a shipped installer.
+
+      - name: Install Vulkan SDK (Windows)
+        if: runner.os == 'Windows'
+        uses: humbletim/install-vulkan-sdk@v1.2
+        with:
+          version: 1.4.309.0
+          cache: true
+
+      - name: Download VAD model
+        shell: bash
+        run: |
+          mkdir -p src-tauri/resources/models
+          curl -fL -o src-tauri/resources/models/silero_vad_v4.onnx \
+            https://www.aitomate.pl/models/silero_vad_v4.onnx
+
+      - name: Install frontend dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build and upload to draft release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "Szeptucha v__VERSION__"
+          releaseBody: "Installers are attached below. Windows: NSIS `*-setup.exe`; macOS (Apple Silicon): `.dmg`."
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}

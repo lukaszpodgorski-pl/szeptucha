@@ -2,7 +2,7 @@
 
 **A local-first, privacy-focused speech-to-text app. Press a shortcut, speak, and your words appear in any text field — entirely on your own device.**
 
-The name comes from the Polish *szeptucha* — a folk wise-woman who heals by whispering. Fitting for a tool that turns your whisper into text without it ever leaving your machine.
+The name comes from the Polish _szeptucha_ — a folk wise-woman who heals by whispering. Fitting for a tool that turns your whisper into text without it ever leaving your machine.
 
 ## How it works
 
@@ -34,10 +34,10 @@ single constant `MODEL_BASE_URL` in
 `https://www.aitomate.pl/models`). Host the curated files there under the same
 filenames:
 
-| Model | File |
-| --- | --- |
-| Parakeet V3 | `parakeet-v3-int8.tar.bin` |
-| Whisper Large | `ggml-large-v3-q5_0.bin` |
+| Model         | File                       |
+| ------------- | -------------------------- |
+| Parakeet V3   | `parakeet-v3-int8.tar.bin` |
+| Whisper Large | `ggml-large-v3-q5_0.bin`   |
 
 The Silero VAD model ships with the repo (`src-tauri/resources/models/`), so no
 download is required for it.
@@ -90,3 +90,39 @@ Maintained by **Łukasz Podgórski**.
 ## License
 
 MIT — see [LICENSE](LICENSE). The original Handy copyright is retained as required.
+
+## Enterprise / on-premises deployment
+
+Szeptucha can be adapted for corporate environments where no traffic may leave
+the internal network. Transcription is already 100% local and the app has no
+telemetry, so there are only two outbound network paths — and both can be
+pointed at internal infrastructure:
+
+| Traffic                        | Default                                    | Internal alternative                               |
+| ------------------------------ | ------------------------------------------ | -------------------------------------------------- |
+| Speech-model downloads         | `https://www.aitomate.pl/models`           | Any internal HTTP server mirroring the model files |
+| LLM post-processing (optional) | `http://localhost:11434/v1` (local Ollama) | Internal LLM server or AI Gateway                  |
+
+How to set it up:
+
+1. **Mirror the models internally.** Copy the model files (same filenames) to an
+   internal HTTP server, then change `MODEL_BASE_URL` in
+   [`src-tauri/src/managers/model.rs`](src-tauri/src/managers/model.rs) — it is
+   the single place that defines the download source — and rebuild the app
+   (`bun run tauri build`). Alternatively, pre-provision the models with your
+   installer image so no download ever happens.
+2. **Point post-processing at an internal LLM or AI Gateway.** The post-processing
+   feature speaks to any OpenAI-compatible endpoint. In _Settings →
+   Post-processing_ set the base URL to your internal inference server (vLLM,
+   Ollama, llama.cpp) or your AI Gateway (e.g. LiteLLM, Kong AI Gateway, Azure
+   API Management). API keys are stored locally and never leave your network.
+   To enforce this for all users, change the default provider in
+   [`src-tauri/src/settings.rs`](src-tauri/src/settings.rs)
+   (`default_post_process_providers`) and set `allow_base_url_edit: false`.
+3. **Lock down egress.** After steps 1-2 the app needs no public internet at
+   all, so endpoint firewall rules can whitelist just the two internal hosts
+   (or block egress entirely when models are pre-provisioned). Installers can
+   be distributed from an internal share, GitHub Enterprise, or your software
+   deployment tooling (Intune/SCCM).
+
+If you need a tailored build for your organisation, contact the maintainer.
