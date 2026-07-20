@@ -1,0 +1,19 @@
+# cargo-audit configuration.
+#
+# Advisories listed here are assessed as not applicable to Szeptucha. Anything
+# not listed still fails the audit, so new advisories are never silenced by
+# accident. Review this list whenever the dependency tree changes.
+[advisories]
+ignore = [
+    # RUSTSEC-2026-0194 / RUSTSEC-2026-0195: quadratic parsing and unbounded
+    # namespace allocation in quick-xml < 0.41.
+    #
+    # Not reachable here. The vulnerable copy (0.39.4) is pulled only by
+    # wayland-scanner, a build-time proc-macro that parses the fixed Wayland
+    # protocol XML shipped inside the crate — never attacker-supplied input.
+    # The chain is Linux/Wayland-only (wayland-scanner -> wl-clipboard-rs ->
+    # arboard -> tauri-plugin-clipboard-manager) and cannot be upgraded until
+    # wayland-scanner relaxes its quick-xml 0.39 requirement.
+    "RUSTSEC-2026-0194",
+    "RUSTSEC-2026-0195",
+]
