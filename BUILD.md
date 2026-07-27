@@ -76,6 +76,15 @@ bun run tauri build
 
 This compiles a release binary and generates platform-specific bundles (deb, rpm, AppImage on Linux; dmg on macOS; msi on Windows).
 
+Tagged builds come from the release workflow, which publishes a Windows NSIS
+installer and a macOS dmg to a draft GitHub Release.
+
+### macOS distribution notes
+
+- The build targets **Apple Silicon** (aarch64) only. A universal (Intel) build is blocked because ONNX Runtime (`ort-sys`, required for VAD and the Parakeet models) ships no prebuilt binaries for `x86_64-apple-darwin`.
+- Apple Intelligence (native post-processing) needs Apple Silicon on macOS 26 or later.
+- The bundle is ad-hoc signed (`signingIdentity: "-"`) and **not notarised** — on first launch Gatekeeper may require manual approval (right-click → Open, or Settings → Privacy & Security).
+
 ## Linux Install (from source)
 
 The raw binary (`src-tauri/target/release/handy`) cannot run standalone — it needs Tauri resource files (tray icons, sounds, VAD model) to be co-located at the expected path.
