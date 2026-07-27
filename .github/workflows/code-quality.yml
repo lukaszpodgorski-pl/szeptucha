@@ -46,6 +46,9 @@ jobs:
       - name: Check translation consistency
         run: bun run check:translations
 
+      - name: Typecheck
+        run: bun run typecheck
+
       - name: Run ESLint
         run: bun run lint
 
