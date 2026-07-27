@@ -45,6 +45,9 @@ blob-report/
 # Local-only tooling (CI pipeline, reports) - never published
 local/
 
+# Machine-specific cargo target-dir (Windows MAX_PATH workaround)
+src-tauri/.cargo/config.toml
+
 # Nix build output
 result
 
