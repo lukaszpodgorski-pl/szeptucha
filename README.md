@@ -4,6 +4,17 @@
 
 The name comes from the Polish _szeptucha_ — a folk wise-woman who heals by whispering. Fitting for a tool that turns your whisper into text without it ever leaving your machine.
 
+## Download
+
+**Windows (x64):** [`szeptucha_1.0.0_x64-setup.exe`](https://github.com/lukaszpodgorski-pl/szeptucha/blob/main/szeptucha_1.0.0_x64-setup.exe)
+
+The `1.0.0` in that filename is a legacy name kept alive for links shared before the
+switch to GitHub Releases — the file itself is always the **current build (1.1.2)**.
+
+Every installer (Windows `.exe` and `.msi`, macOS Apple Silicon `.dmg`) is attached to
+the [latest release](https://github.com/lukaszpodgorski-pl/szeptucha/releases/latest);
+prefer those links when sharing.
+
 ## How it works
 
 1. **Press** a configurable keyboard shortcut to start/stop recording (or use push-to-talk).
